@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>n8n Workflow Expert</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+   import React, { useState } from 'react';
+import { Play, ExternalLink, Github, Linkedin, Mail, Plus, Edit2, Trash2, X } from 'lucide-react';
+
+export default function N8nPortfolio() {
+  const [workflows, setWorkflows] = useState([
+    {
+      id: 1,
+      title: "Automated Lead Generation System",
+      description: "Automatically scrape leads from LinkedIn, enrich data via APIs, and send personalized emails. Saves 20+ hours weekly.",
+      screenshot: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop",
+      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      tags: ["Lead Gen", "Email", "CRM"]
+    },
+    {
+      id: 2,
+      title: "E-commerce Order Processing",
+      description: "Connect Shopify, inventory management, and shipping APIs. Auto-process orders, update stock, and notify customers.",
+      screenshot: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&h=450&fit=crop",
+      videoUrl: "",
+      tags: ["E-commerce", "Shopify", "Automation"]
+    }
+  ]);
+
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    screenshot: '',
+    videoUrl: '',
+    tags: ''
+  });
+
+  const handleSubmit = () => {
+    if (!formData.title || !formData.description || !formData.screenshot) {
+      alert('Please fill in all required fields');
+      return;
+    }
+    
+    const tagsArray = formData.tags.split(',').map(t => t.trim()).filter(t => t);
+    
+    if (editingId) {
+      setWorkflows(workflows.map(w => 
+        w.id === editingId 
+          ? { ...w, ...formData, tags: tagsArray }
+          : w
+      ));
+      setEditingId(null);
+    } else {
+      const newWorkflow = {
+        id: Date.now(),
+        ...formData,
+        tags: tagsArray
+      };
+      setWorkflows([...workflows, newWorkflow]);
+    }
+    
+    setFormData({ title: '', description: '', screenshot: '', videoUrl: '', tags: '' });
+    setIsFormOpen(false);
+  };
+
+  const handleEdit = (workflow) => {
+    setFormData({
+      title: workflow.title,
+      description: workflow.description,
+      screenshot: workflow.screenshot,
+      videoUrl: workflow.videoUrl,
+      tags: workflow.tags.join(', ')
+    });
+    setEditingId(workflow.id);
+    setIsFormOpen(true);
+  };
+
+  const handleDelete = (id) => {
+    if (confirm('Delete this workflow?')) {
+      setWorkflows(workflows.filter(w => w.id !== id));
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Header */}
+      <header className="bg-black/30 backdrop-blur-md border-b border-white/10 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-white">n8n Workflow Expert</h1>
+              <p className="text-purple-300 mt-1">Automation Solutions That Scale Your Business</p>
+            </div>
+            <button
+              onClick={() => {
+                setFormData({ title: '', description: '', screenshot: '', videoUrl: '', tags: '' });
+                setEditingId(null);
+                setIsFormOpen(true);
+              }}
+              className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
+            >
+              <Plus size={20} />
+              Add Workflow
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-5xl font-bold text-white mb-6">
+            Automate Your Business with <span className="text-purple-400">n8n Workflows</span>
+          </h2>
+          <p className="text-xl text-gray-300 mb-8">
+            I build custom automation solutions that save time, reduce errors, and scale your operations. 
+            From simple integrations to complex multi-step workflows.
+          </p>
+          <div className="flex gap-4 justify-center flex-wrap">
+            <a href="#contact" className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105 inline-flex items-center gap-2">
+              <Mail size={20} />
+              Hire Me on Upwork
+            </a>
+            <a href="#workflows" className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg font-semibold transition-all backdrop-blur-sm inline-flex items-center gap-2">
+              <Play size={20} />
+              View Workflows
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Workflows Grid */}
+      <section id="workflows" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <h3 className="text-3xl font-bold text-white mb-12 text-center">Featured Workflows</h3>
+        <div className="grid md:grid-cols-2 gap-8">
+          {workflows.map((workflow) => (
+            <div key={workflow.id} className="bg-white/5 backdrop-blur-lg rounded-2xl overflow-hidden border border-white/10 hover:border-purple-500/50 transition-all transform hover:scale-105">
+              {/* Screenshot */}
+              <div className="relative h-64 bg-gradient-to-br from-purple-600/20 to-blue-600/20">
+                <img 
+                  src={workflow.screenshot} 
+                  alt={workflow.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => e.target.style.display = 'none'}
+                />
+                <div className="absolute top-4 right-4 flex gap-2">
+                  <button
+                    onClick={() => handleEdit(workflow)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-all"
+                  >
+                    <Edit2 size={16} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(workflow.id)}
+                    className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-all"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <h4 className="text-2xl font-bold text-white mb-3">{workflow.title}</h4>
+                <p className="text-gray-300 mb-4">{workflow.description}</p>
+                
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {workflow.tags.map((tag, idx) => (
+                    <span key={idx} className="bg-purple-600/30 text-purple-300 px-3 py-1 rounded-full text-sm">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Video Button */}
+                {workflow.videoUrl && (
+                  <a
+                    href={workflow.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"
+                  >
+                    <Play size={20} />
+                    Watch Demo
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-12 border border-white/10">
+          <h3 className="text-3xl font-bold text-white mb-8 text-center">What I Can Build For You</h3>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="bg-purple-600/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ExternalLink className="text-purple-400" size={32} />
+              </div>
+              <h4 className="text-xl font-semibold text-white mb-2">API Integrations</h4>
+              <p className="text-gray-300">Connect any tools and services seamlessly</p>
+            </div>
+            <div className="text-center">
+              <div className="bg-purple-600/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Mail className="text-purple-400" size={32} />
+              </div>
+              <h4 className="text-xl font-semibold text-white mb-2">Email Automation</h4>
+              <p className="text-gray-300">Automated campaigns and notifications</p>
+            </div>
+            <div className="text-center">
+              <div className="bg-purple-600/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Play className="text-purple-400" size={32} />
+              </div>
+              <h4 className="text-xl font-semibold text-white mb-2">Data Processing</h4>
+              <p className="text-gray-300">Transform and route data automatically</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 backdrop-blur-lg rounded-2xl p-12 border border-white/10 text-center">
+          <h3 className="text-3xl font-bold text-white mb-4">Ready to Automate?</h3>
+          <p className="text-xl text-gray-300 mb-8">Let's discuss your workflow needs and build something amazing together.</p>
+          <div className="flex gap-4 justify-center flex-wrap">
+            <a href="https://upwork.com" target="_blank" rel="noopener noreferrer" className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-semibold transition-all inline-flex items-center gap-2">
+              <ExternalLink size={20} />
+              Hire on Upwork
+            </a>
+            <a href="https://fiverr.com" target="_blank" rel="noopener noreferrer" className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-semibold transition-all inline-flex items-center gap-2">
+              <ExternalLink size={20} />
+              Hire on Fiverr
+            </a>
+            <a href="mailto:your@email.com" className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg font-semibold transition-all backdrop-blur-sm inline-flex items-center gap-2">
+              <Mail size={20} />
+              Email Me
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-black/30 backdrop-blur-md border-t border-white/10 mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-between items-center flex-wrap gap-4">
+            <p className="text-gray-400">© 2024 n8n Workflow Expert. All rights reserved.</p>
+            <div className="flex gap-4">
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                <Github size={24} />
+              </a>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                <Linkedin size={24} />
+              </a>
+              <a href="mailto:your@email.com" className="text-gray-400 hover:text-white transition-colors">
+                <Mail size={24} />
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* Add/Edit Form Modal */}
+      {isFormOpen && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-white/10">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold text-white">
+                  {editingId ? 'Edit Workflow' : 'Add New Workflow'}
+                </h3>
+                <button
+                  onClick={() => {
+                    setIsFormOpen(false);
+                    setEditingId(null);
+                    setFormData({ title: '', description: '', screenshot: '', videoUrl: '', tags: '' });
+                  }}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-white mb-2 font-semibold">Title *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.title}
+                    onChange={(e) => setFormData({...formData, title: e.target.value})}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                    placeholder="e.g., Automated Lead Generation System"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-white mb-2 font-semibold">Description *</label>
+                  <textarea
+                    required
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    rows="3"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                    placeholder="Brief description of what this workflow does..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-white mb-2 font-semibold">Screenshot URL *</label>
+                  <input
+                    type="url"
+                    required
+                    value={formData.screenshot}
+                    onChange={(e) => setFormData({...formData, screenshot: e.target.value})}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                    placeholder="https://example.com/screenshot.png"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-white mb-2 font-semibold">Video URL (optional)</label>
+                  <input
+                    type="url"
+                    value={formData.videoUrl}
+                    onChange={(e) => setFormData({...formData, videoUrl: e.target.value})}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                    placeholder="https://youtube.com/watch?v=..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-white mb-2 font-semibold">Tags (comma-separated)</label>
+                  <input
+                    type="text"
+                    value={formData.tags}
+                    onChange={(e) => setFormData({...formData, tags: e.target.value})}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                    placeholder="e.g., Lead Gen, Email, CRM"
+                  />
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                  <button
+                    onClick={handleSubmit}
+                    className="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"
+                  >
+                    {editingId ? 'Update Workflow' : 'Add Workflow'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsFormOpen(false);
+                      setEditingId(null);
+                      setFormData({ title: '', description: '', screenshot: '', videoUrl: '', tags: '' });
+                    }}
+                    className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-semibold transition-all"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+  </script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</body>
+</html>
